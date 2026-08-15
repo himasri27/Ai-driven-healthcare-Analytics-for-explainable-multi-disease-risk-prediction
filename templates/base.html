@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Healthcare Analytics{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    {% if session.user_id %}
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>HealthCare Analytics</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                {% if not session.is_admin %}
+                <li class="nav-dropdown">
+                    <a href="#" class="dropdown-toggle">Predictions <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('predict', disease='diabetes') }}">Diabetes</a>
+                        <a href="{{ url_for('predict', disease='heart_disease') }}">Heart Disease</a>
+                        <a href="{{ url_for('predict', disease='kidney_disease') }}">Kidney Disease</a>
+                    </div>
+                </li>
+                <li><a href="{{ url_for('prediction_history') }}">History</a></li>
+                <li><a href="{{ url_for('patient_info') }}">Patient Info</a></li>
+                {% else %}
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                {% endif %}
+                <li class="nav-user">
+                    <span><i class="fas fa-user-circle"></i> {{ session.username }}</span>
+                </li>
+                <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 AI Healthcare Analytics. All rights reserved.</p>
+        <p>Disclaimer: This system is for informational purposes only and should not replace professional medical advice.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

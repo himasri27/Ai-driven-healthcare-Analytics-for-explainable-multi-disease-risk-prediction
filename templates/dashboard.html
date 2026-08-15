@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Healthcare Analytics{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Welcome, {{ session.username }}!</h1>
+        <p>AI-Driven Healthcare Analytics Dashboard</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Quick Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Predictions Made</h3>
+                    <p class="stat-value">{{ predictions|length if predictions else 0 }}</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Last Check</h3>
+                    <p class="stat-value">
+                        {% if predictions and predictions|length > 0 and predictions[0].prediction_date %}
+                            {{ predictions[0].prediction_date[:10] }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Disease Predictions</h3>
+                    <p class="stat-value">3</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="patient-info-section">
+            <div class="section-header">
+                <h2>Patient Information</h2>
+                <a href="{{ url_for('patient_info') }}" class="btn btn-small btn-primary">
+                    <i class="fas fa-edit"></i> Update Info
+                </a>
+            </div>
+
+            {% if patient %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Age:</label>
+                    <span>{{ patient.age }} years</span>
+                </div>
+                <div class="info-item">
+                    <label>Gender:</label>
+                    <span>{{ patient.gender }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Blood Type:</label>
+                    <span>{{ patient.blood_type }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No patient information found. <a href="{{ url_for('patient_info') }}">Add your information</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Predictions -->
+        <div class="quick-predict-section">
+            <div class="section-header">
+                <h2>Disease Predictions</h2>
+            </div>
+
+            <div class="prediction-cards">
+                <a href="{{ url_for('predict', disease='diabetes') }}" class="predict-card">
+                    <div class="card-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3>Diabetes</h3>
+                    <p>Blood Glucose Analysis</p>
+                </a>
+
+                <a href="{{ url_for('predict', disease='heart_disease') }}" class="predict-card">
+                    <div class="card-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Heart Disease</h3>
+                    <p>Cardiovascular Risk</p>
+                </a>
+
+                <a href="{{ url_for('predict', disease='kidney_disease') }}" class="predict-card">
+                    <div class="card-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>Kidney Disease</h3>
+                    <p>Renal Function</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Predictions -->
+        {% if predictions %}
+        <div class="recent-predictions-section">
+            <div class="section-header">
+                <h2>Recent Predictions</h2>
+                <a href="{{ url_for('prediction_history') }}" class="link-button">View All →</a>
+            </div>
+
+            <div class="predictions-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Disease</th>
+                            <th>Result</th>
+                            <th>Confidence</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prediction in predictions[:5] %}
+                        <tr>
+                            <td>{{ prediction.disease }}</td>
+                            <td>
+                                <span class="badge {% if prediction.prediction == 'Positive' %}badge-danger{% else %}badge-success{% endif %}">
+                                    {{ prediction.prediction }}
+                                </span>
+                            </td>
+                            <td>{{ "%.2f"|format(prediction.confidence) }}%</td>
+                            <td>{{ prediction.prediction_date[:10] }}</td>
+                            <td>
+                                <a href="{{ url_for('download_report', prediction_id=prediction.id) }}" class="btn btn-small btn-primary">
+                                    <i class="fas fa-download"></i> Report
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No predictions yet. Start by selecting a disease to predict.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 30px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .dashboard-header {
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .dashboard-header h1 {
+        color: #1F4788;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        gap: 30px;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        font-size: 40px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 5px 0 0 0;
+    }
+
+    .prediction-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .predict-card {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .predict-card:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .card-icon {
+        font-size: 40px;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .predict-card h3 {
+        margin: 10px 0 5px;
+        color: #1F4788;
+    }
+
+    .predict-card p {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+        color: #1F4788;
+    }
+
+    .link-button {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .link-button:hover {
+        color: #764ba2;
+    }
+
+    .predictions-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .predictions-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .predictions-table th {
+        background-color: #f5f5f5;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .predictions-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-danger {
+        background-color: #ffe0e0;
+        color: #d32f2f;
+    }
+
+    .badge-success {
+        background-color: #e0f7e0;
+        color: #2e7d32;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .predictions-table {
+            overflow-x: auto;
+        }
+
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}

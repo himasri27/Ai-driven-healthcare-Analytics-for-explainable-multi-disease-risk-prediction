@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Result - Healthcare Analytics{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <div class="result-header">
+        <h1>Prediction Result</h1>
+        <p>{{ disease }} Risk Assessment</p>
+    </div>
+
+    <div class="result-wrapper">
+        <!-- Main Prediction Result -->
+        <div class="result-card">
+            <div class="result-status {% if prediction == 1 %}high-risk{% else %}low-risk{% endif %}">
+                {% if prediction == 1 %}
+                    <div class="status-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2>HIGH RISK</h2>
+                    <p>The analysis indicates a higher risk of {{ disease }}</p>
+                {% else %}
+                    <div class="status-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>LOW RISK</h2>
+                    <p>The analysis indicates a lower risk of {{ disease }}</p>
+                {% endif %}
+            </div>
+
+            <div class="confidence-meter">
+                <div class="meter-label">
+                    <span>Prediction Confidence</span>
+                    <span class="meter-value">{{ "%.1f"|format(confidence) }}%</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: {{ confidence }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Explanation -->
+        {% if explanation %}
+        <div class="explanation-card">
+            <h3><i class="fas fa-lightbulb"></i> SHAP Model Explanation</h3>
+            <p class="explanation-intro">
+                This section explains which factors most influenced the prediction using SHAP (SHapley Additive exPlanations).
+            </p>
+
+            {% if explanation.feature_names %}
+            <div class="explanation-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Your Value</th>
+                            <th>Impact Score</th>
+                            <th>Direction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for feature in explanation.feature_names %}
+                        {% set i = loop.index0 %}
+                        {% if explanation.shap_values and i < explanation.shap_values|length %}
+                        <tr>
+                            <td><strong>{{ feature }}</strong></td>
+                            <td>{{ data.get(feature, 'N/A') }}</td>
+                            <td>
+                                <div class="impact-score">
+                                    {{ "%.4f"|format(explanation.shap_values[i]) }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if explanation.shap_values[i] > 0 %}
+                                    <span class="direction increase">
+                                        <i class="fas fa-arrow-up"></i> Increases Risk
+                                    </span>
+                                {% elif explanation.shap_values[i] < 0 %}
+                                    <span class="direction decrease">
+                                        <i class="fas fa-arrow-down"></i> Decreases Risk
+                                    </span>
+                                {% else %}
+                                    <span class="direction neutral">
+                                        <i class="fas fa-minus"></i> Neutral
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Input Data Summary -->
+        <div class="input-summary-card">
+            <h3><i class="fas fa-clipboard-list"></i> Input Data Summary</h3>
+            <div class="data-grid">
+                {% for feature, value in data.items() %}
+                <div class="data-item">
+                    <span class="data-label">{{ feature }}</span>
+                    <span class="data-value">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-card">
+            <h3><i class="fas fa-stethoscope"></i> Recommendations</h3>
+            {% if prediction == 1 %}
+            <ul class="recommendations-list">
+                <li>Schedule an appointment with your healthcare provider for further evaluation</li>
+                <li>Get laboratory tests to confirm the condition</li>
+                <li>Review your lifestyle and make necessary health improvements</li>
+                <li>Keep a record of your symptoms and health changes</li>
+                <li>Follow your doctor's advice and treatment plan</li>
+            </ul>
+            {% else %}
+            <ul class="recommendations-list">
+                <li>Maintain your current healthy lifestyle</li>
+                <li>Continue regular health check-ups with your doctor</li>
+                <li>Stay physically active with regular exercise</li>
+                <li>Maintain a balanced and nutritious diet</li>
+                <li>Monitor your health regularly using this tool</li>
+            </ul>
+            {% endif %}
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+            <h4><i class="fas fa-exclamation-circle"></i> Important Disclaimer</h4>
+            <p>
+                This prediction is generated by an AI machine learning model and is for informational purposes only. 
+                It should <strong>NOT</strong> be used as a substitute for professional medical diagnosis or treatment. 
+                Always consult with a qualified healthcare professional for accurate diagnosis and personalized medical advice. 
+                This tool is not a medical device and cannot provide medical care.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{{ url_for('download_report', prediction_id=1) }}" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download PDF Report
+            </a>
+            <a href="{{ url_for('prediction_history') }}" class="btn btn-secondary">
+                <i class="fas fa-history"></i> View History
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .result-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .result-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .result-header h1 {
+        color: #1F4788;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .result-wrapper {
+        display: grid;
+        gap: 30px;
+    }
+
+    .result-card,
+    .explanation-card,
+    .input-summary-card,
+    .recommendations-card,
+    .disclaimer-box {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-status {
+        text-align: center;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .result-status.high-risk {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+        border-left: 4px solid #d32f2f;
+    }
+
+    .result-status.low-risk {
+        background: linear-gradient(135deg, #f5fff5 0%, #e0ffe0 100%);
+        border-left: 4px solid #2e7d32;
+    }
+
+    .status-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .result-status h2 {
+        font-size: 28px;
+        margin: 10px 0;
+    }
+
+    .confidence-meter {
+        margin-top: 20px;
+    }
+
+    .meter-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .meter-value {
+        color: #667eea;
+        font-size: 18px;
+    }
+
+    .meter-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .meter-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.5s ease;
+    }
+
+    .explanation-card h3,
+    .input-summary-card h3,
+    .recommendations-card h3,
+    .disclaimer-box h4 {
+        color: #1F4788;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+
+    .explanation-intro {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .explanation-table {
+        overflow-x: auto;
+    }
+
+    .explanation-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .explanation-table th {
+        background-color: #f5f5f5;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .explanation-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .impact-score {
+        font-family: monospace;
+        background-color: #f0f4ff;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .direction {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .direction.increase {
+        background-color: #ffe0e0;
+        color: #d32f2f;
+    }
+
+    .direction.decrease {
+        background-color: #e0ffe0;
+        color: #2e7d32;
+    }
+
+    .direction.neutral {
+        background-color: #f0f0f0;
+        color: #666;
+    }
+
+    .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .data-item {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 3px solid #667eea;
+    }
+
+    .data-label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .data-value {
+        display: block;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1F4788;
+    }
+
+    .recommendations-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .recommendations-list li {
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #f9f9f9;
+        border-left: 3px solid #667eea;
+        border-radius: 3px;
+    }
+
+    .recommendations-list li:before {
+        content: "✓ ";
+        color: #2e7d32;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+    .disclaimer-box {
+        background: #fff8e1;
+        border-left: 4px solid #f57f17;
+    }
+
+    .disclaimer-box p {
+        color: #333;
+        line-height: 1.8;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-outline {
+        background: white;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline:hover {
+        background: #f0f4ff;
+    }
+
+    @media (max-width: 768px) {
+        .result-card {
+            padding: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Template Macros for Jinja2 -->
+{% set enumerate = namespace(value=0) %}
+{% for item in [] %}{% endfor %}
+
+<script>
+    // Re-add enumerate support for template
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Healthcare Analytics{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">404</div>
+        <h1>Page Not Found</h1>
+        <p>Sorry, the page you're looking for doesn't exist or has been moved.</p>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Go to Dashboard
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Go to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        padding: 20px;
+    }
+
+    .error-content {
+        text-align: center;
+    }
+
+    .error-code {
+        font-size: 120px;
+        font-weight: 700;
+        color: #667eea;
+        line-height: 1;
+        margin-bottom: 20px;
+    }
+
+    .error-content h1 {
+        color: #1F4788;
+        font-size: 36px;
+        margin-bottom: 15px;
+    }
+
+    .error-content p {
+        color: #666;
+        font-size: 18px;
+        margin-bottom: 40px;
+        max-width: 500px;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}

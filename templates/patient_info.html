@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Information - Healthcare Analytics{% endblock %}
+
+{% block content %}
+<div class="patient-info-container">
+    <div class="form-header">
+        <h1>Patient Information</h1>
+        <p>Please provide or update your patient details</p>
+    </div>
+
+    <div class="form-wrapper">
+        <form method="POST" class="patient-form">
+            <div class="form-section">
+                <h2>Personal Details</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age (in years) *</label>
+                        <input type="number" id="age" name="age" min="1" max="120" 
+                               value="{{ patient.age if patient else '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male" {% if patient and patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if patient and patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if patient and patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="blood_type">Blood Type *</label>
+                        <select id="blood_type" name="blood_type" required>
+                            <option value="">-- Select Blood Type --</option>
+                            <option value="O+" {% if patient and patient.blood_type == 'O+' %}selected{% endif %}>O+</option>
+                            <option value="O-" {% if patient and patient.blood_type == 'O-' %}selected{% endif %}>O-</option>
+                            <option value="A+" {% if patient and patient.blood_type == 'A+' %}selected{% endif %}>A+</option>
+                            <option value="A-" {% if patient and patient.blood_type == 'A-' %}selected{% endif %}>A-</option>
+                            <option value="B+" {% if patient and patient.blood_type == 'B+' %}selected{% endif %}>B+</option>
+                            <option value="B-" {% if patient and patient.blood_type == 'B-' %}selected{% endif %}>B-</option>
+                            <option value="AB+" {% if patient and patient.blood_type == 'AB+' %}selected{% endif %}>AB+</option>
+                            <option value="AB-" {% if patient and patient.blood_type == 'AB-' %}selected{% endif %}>AB-</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical_history">Medical History</label>
+                        <textarea id="medical_history" name="medical_history" placeholder="Any relevant medical history..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Information
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .patient-info-container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .form-header h1 {
+        color: #1F4788;
+        margin-bottom: 10px;
+    }
+
+    .form-wrapper {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section h2 {
+        color: #1F4788;
+        margin-bottom: 20px;
+        font-size: 18px;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .form-actions .btn {
+        flex: 1;
+    }
+
+    @media (max-width: 600px) {
+        .patient-info-container {
+            margin: 20px;
+        }
+
+        .form-wrapper {
+            padding: 20px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

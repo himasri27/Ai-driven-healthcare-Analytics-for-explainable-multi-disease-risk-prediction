@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Healthcare Analytics{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">500</div>
+        <h1>Server Error</h1>
+        <p>Sorry, something went wrong on our end. Our team has been notified and is working to fix it.</p>
+        
+        <div class="error-details">
+            <p>Error Code: INTERNAL_SERVER_ERROR</p>
+            <p>Please try again later or contact support if the problem persists.</p>
+        </div>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Go to Dashboard
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Go to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        padding: 20px;
+    }
+
+    .error-content {
+        text-align: center;
+    }
+
+    .error-code {
+        font-size: 120px;
+        font-weight: 700;
+        color: #d32f2f;
+        line-height: 1;
+        margin-bottom: 20px;
+    }
+
+    .error-content h1 {
+        color: #1F4788;
+        font-size: 36px;
+        margin-bottom: 15px;
+    }
+
+    .error-content p {
+        color: #666;
+        font-size: 18px;
+        margin-bottom: 20px;
+        max-width: 500px;
+    }
+
+    .error-details {
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .error-details p {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}

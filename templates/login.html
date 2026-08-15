@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Healthcare Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box login-box">
+            <div class="auth-header">
+                <i class="fas fa-heartbeat"></i>
+                <h1>Healthcare Analytics</h1>
+                <p>AI-Driven Multi-Disease Risk Prediction</p>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            </div>
+        </div>
+
+        <div class="auth-sidebar">
+            <div class="sidebar-content">
+                <h2>Welcome to HealthCare Analytics</h2>
+                <p>Predict your health risks with explainable AI powered by machine learning.</p>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> Diabetes Risk Prediction</li>
+                    <li><i class="fas fa-check"></i> Heart Disease Detection</li>
+                    <li><i class="fas fa-check"></i> Kidney Disease Screening</li>
+                    <li><i class="fas fa-check"></i> SHAP Explainability</li>
+                    <li><i class="fas fa-check"></i> Prediction History</li>
+                    <li><i class="fas fa-check"></i> PDF Reports</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
