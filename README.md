@@ -1,0 +1,2 @@
+# Ai-driven-healthcare-Analytics-for-explainable-multi-disease-risk-prediction
+AI Healthcare Analytics is an AI/ML-based web application that predicts the risk of *Diabetes, Heart Disease, and Kidney Disease*using patient health data. It uses  Explainable AI (SHAP) to show the factors influencing each prediction. It allows users to log in, view past predictions helping them understand their health risks and take early action.
