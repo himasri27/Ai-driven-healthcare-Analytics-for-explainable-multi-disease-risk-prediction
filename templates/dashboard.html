@@ -30,7 +30,7 @@
                     <h3>Last Check</h3>
                     <p class="stat-value">
                         {% if predictions and predictions|length > 0 and predictions[0].prediction_date %}
-                            {{ predictions[0].prediction_date[:10] }}
+                            {{ predictions[0].prediction_date.strftime('%Y-%m-%d') }}
                         {% else %}
                             Never
                         {% endif %}
@@ -143,7 +143,7 @@
                                 </span>
                             </td>
                             <td>{{ "%.2f"|format(prediction.confidence) }}%</td>
-                            <td>{{ prediction.prediction_date[:10] }}</td>
+                            <td>{{ prediction.prediction_date.strftime('%Y-%m-%d') }}</td>
                             <td>
                                 <a href="{{ url_for('download_report', prediction_id=prediction.id) }}" class="btn btn-small btn-primary">
                                     <i class="fas fa-download"></i> Report
